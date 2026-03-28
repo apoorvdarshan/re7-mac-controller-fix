@@ -6,6 +6,8 @@ If `Resident Evil 7.app` opens on your Mac but your wired controller does nothin
 
 It was made for unofficial Wine-wrapped macOS builds of RE7 that launch the Windows game inside a Mac app bundle. It is not meant for the official native Mac release.
 
+If your controller fix works but the game opens at the wrong fullscreen size when switching between the MacBook display and an external monitor, use the `mixed-display-fullscreen-fix` branch of this repo.
+
 ## Disclaimer
 
 This repo was tested against an unofficial third-party RE7 app bundle, not an official Mac release from Capcom. I do not provide, host, or link to game files here.
@@ -20,6 +22,7 @@ This repo gives you:
 
 - a quick test to see how the game bundle detects your controller
 - a patch that adds the right SDL controller setup for the wrapper
+- on the `mixed-display-fullscreen-fix` branch, a launcher tweak that picks the closest fullscreen mode for the current main display before the game starts
 - a revert script if you want to undo everything
 
 ## Before you start
