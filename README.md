@@ -51,6 +51,8 @@ Then:
 4. Launch `Resident Evil 7.app`.
 5. Test the controller in-game.
 
+If everything works except the D-pad or arrow directions, update to the latest repo version and run `./scripts/patch-re7.sh "/Applications/Resident Evil 7.app"` again.
+
 ## Optional fullscreen branch
 
 If the controller fix works but fullscreen opens at the wrong size on different displays, use:
