@@ -1,73 +1,111 @@
 # re7-mac-controller-fix
 
-Fixes wired controller detection for the Wine-wrapped macOS build of Resident Evil 7 by adding the correct SDL controller mapping and launch-time SDL environment setup.
+![Resident Evil 7 logo](assets/re7-logo.png)
 
-## What this repo does
+If `Resident Evil 7.app` opens on your Mac but your wired controller does nothing in-game, this toolkit may fix it.
 
-Some Wine-wrapped macOS builds of RE7 can see a controller as a raw joystick but fail to promote it to an SDL game controller. When that happens, Wine never exposes the pad as a proper XInput device, so the game ignores it.
+It was made for unofficial Wine-wrapped macOS builds of RE7 that launch the Windows game inside a Mac app bundle. It is not meant for the official native Mac release.
+
+## Disclaimer
+
+This repo was tested against an unofficial third-party RE7 app bundle, not an official Mac release from Capcom. I do not provide, host, or link to game files here.
+
+Use this only if you have the legal right to use the game software involved. Unofficial or modified app bundles can be unstable, tampered with, or unsafe, so use them at your own risk.
+
+## What this fixes
+
+Some wrapped RE7 builds can see a controller as a basic joystick, but not as a proper game controller. When that happens, the game starts, but controller input never reaches RE7 correctly.
 
 This repo gives you:
 
-- a probe script to print your controller GUID using the app bundle's own `x86_64` SDL runtime
-- a patch script that injects:
-  - an `x86_64` SDL warm-up helper
-  - a custom launcher that exports SDL environment variables
-  - an `SDL_GAMECONTROLLERCONFIG` mapping for your controller
-- a revert script to restore the original launcher state
+- a quick test to see how the game bundle detects your controller
+- a patch that adds the right SDL controller setup for the wrapper
+- a revert script if you want to undo everything
 
-## Tested target
+## Before you start
 
-This was built around the Wine/Sikarugir-wrapped `Resident Evil 7.app` layout:
+Use this if all of these are true:
 
-- `Contents/MacOS/Sikarugir`
-- `Contents/Frameworks/libSDL2-2.0.0.dylib`
-- `Contents/SharedSupport/wine/bin/wine`
+- the game already launches on your Mac
+- macOS itself can see your controller
+- the controller does not work properly inside RE7
+- your `Resident Evil 7.app` is a wrapped Windows build, not a native Mac port
 
-## Quick start
+You will need:
 
-Install SDL2 headers first if you do not already have them:
+- macOS
+- Terminal
+- Homebrew
+
+Install the required tools once:
 
 ```bash
 brew install sdl2 pkg-config
 ```
 
-Probe your controller first:
+## Files in this repo
+
+- `scripts/probe-controller.sh` checks how the game bundle currently sees your controller
+- `scripts/patch-re7.sh` applies the controller fix
+- `scripts/revert-re7.sh` restores the original launcher setup
+
+## Step 1: Check your controller
+
+Run:
 
 ```bash
 ./scripts/probe-controller.sh "/Applications/Resident Evil 7.app"
 ```
 
-If the output shows `isGameController=0`, patch the app with a controller mapping:
+You are looking for this part of the output:
+
+- `isGameController=0` means the wrapper sees your pad incorrectly, and this fix is likely relevant
+- `isGameController=1` means the wrapper already sees it as a game controller
+
+## Step 2: Apply the fix
+
+Run:
 
 ```bash
 ./scripts/patch-re7.sh "/Applications/Resident Evil 7.app"
 ```
 
-By default, `patch-re7.sh` uses the known-good mapping for this GUID:
+Then do this:
 
-```text
-050000695e040000e002000000696d00
-```
+1. Fully quit the game.
+2. Unplug the controller.
+3. Plug it back in.
+4. Launch `Resident Evil 7.app` normally.
+5. Test the controller in-game.
 
-Then fully quit RE7, unplug/replug the controller, and launch the app normally from `Applications`.
+## What the patch changes
 
-## Custom mapping
+The patch:
 
-If your controller has a different GUID, pass a full SDL mapping as the second argument:
+- adds a short SDL warm-up helper that runs before the wrapper starts Wine
+- adds SDL environment settings to the app launcher
+- adds a controller mapping so the wrapper treats the pad as a proper game controller
+- keeps a backup so you can undo the change later
+
+## If your controller has a different GUID
+
+Most people can skip this section.
+
+If your controller is different, you can pass your own SDL mapping as the second argument:
 
 ```bash
 ./scripts/patch-re7.sh "/Applications/Resident Evil 7.app" 'GUID,name,a:b0,b:b1,...'
 ```
 
-You can test a mapping before patching:
+You can also test a mapping first:
 
 ```bash
 ./scripts/probe-controller.sh "/Applications/Resident Evil 7.app" 'GUID,name,a:b0,b:b1,...'
 ```
 
-## Revert
+## Undo the patch
 
-To restore the original launcher state:
+If you want to restore the original app launcher:
 
 ```bash
 ./scripts/revert-re7.sh "/Applications/Resident Evil 7.app"
@@ -76,7 +114,20 @@ To restore the original launcher state:
 ## Notes
 
 - This modifies the app bundle directly.
-- The patch script stores backups under:
-  - `Contents/Resources/re7-mac-controller-fix/`
-- The fix is aimed at controller detection only. It does not remap buttons inside the game.
-- The helper binaries are compiled as `x86_64` to match the wrapper's Wine/SDL runtime.
+- The backup is stored inside `Contents/Resources/re7-mac-controller-fix/`.
+- The fix only helps the wrapper detect the controller correctly. It does not change your in-game button layout.
+- The helper binaries are built as `x86_64` because that matches the wrapper runtime used by these builds.
+
+## Tested wrapper layout
+
+This repo was built around a wrapper with files like these inside `Resident Evil 7.app`:
+
+- `Contents/MacOS/Sikarugir`
+- `Contents/Frameworks/libSDL2-2.0.0.dylib`
+- `Contents/SharedSupport/wine/bin/wine`
+
+If your app bundle looks similar, this repo is likely aimed at the right target.
+
+## Logo credit
+
+README logo source: [Wikimedia Commons, "Logo Resident Evil VII.svg"](https://commons.wikimedia.org/wiki/File:Logo_Resident_Evil_VII.svg). Trademark belongs to Capcom.
