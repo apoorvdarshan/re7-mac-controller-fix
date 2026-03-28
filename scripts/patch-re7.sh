@@ -26,7 +26,9 @@ fi
 
 if [[ "${TARGET_EXECUTABLE}" == "launcher-env" && -f "${TARGET_FILE}" ]]; then
   TARGET_EXECUTABLE="$(<"${TARGET_FILE}")"
-elif [[ "${TARGET_EXECUTABLE}" == "launcher-env" ]]; then
+fi
+
+if [[ "${TARGET_EXECUTABLE}" == "launcher-env" ]]; then
   if [[ -e "${MACOS_DIR}/launcher" ]]; then
     TARGET_EXECUTABLE="launcher"
   else
@@ -34,7 +36,7 @@ elif [[ "${TARGET_EXECUTABLE}" == "launcher-env" ]]; then
   fi
 fi
 
-if [[ ! -f "${TARGET_FILE}" ]]; then
+if [[ ! -f "${TARGET_FILE}" || "$(<"${TARGET_FILE}")" == "launcher-env" ]]; then
   printf '%s\n' "${TARGET_EXECUTABLE}" > "${TARGET_FILE}"
 fi
 
