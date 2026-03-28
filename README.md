@@ -127,7 +127,3 @@ This repo was built around a wrapper with files like these inside `Resident Evil
 - `Contents/SharedSupport/wine/bin/wine`
 
 If your app bundle looks similar, this repo is likely aimed at the right target.
-
-## Logo credit
-
-README logo source: [Wikimedia Commons, "Logo Resident Evil VII.svg"](https://commons.wikimedia.org/wiki/File:Logo_Resident_Evil_VII.svg). Trademark belongs to Capcom.
