@@ -53,6 +53,32 @@ Then:
 
 If everything works except the D-pad or arrow directions, update to the latest repo version and run `./scripts/patch-re7.sh "/Applications/Resident Evil 7.app"` again.
 
+## Tested fresh reinstall
+
+The current fresh Kegworks/Wineskin reinstall uses controller GUID
+`030080805e0400008e02000010016800`. Its tested mapping has button-based
+D-pad inputs and inverted vertical axes for both sticks:
+
+```text
+030080805e0400008e02000010016800,Controller,a:b0,b:b1,back:b4,dpdown:b12,dpleft:b13,dpright:b14,dpup:b11,guide:b5,leftshoulder:b9,leftstick:b7,lefttrigger:a4,leftx:a0,lefty:a1~,rightshoulder:b10,rightstick:b8,righttrigger:a5,rightx:a2,righty:a3~,start:b6,x:b2,y:b3,
+```
+
+With the game fully closed, apply that mapping persistently:
+
+```bash
+./scripts/apply-fresh-install-fix.sh "/Applications/Resident Evil 7.app"
+```
+
+This stores the SDL settings in the app's `LSEnvironment`, keeps
+`CFBundleExecutable=wineskinlauncher`, refreshes Launch Services, and survives
+normal app relaunches, logout, and reboot.
+
+To restore the app plist saved before this fix:
+
+```bash
+./scripts/revert-fresh-install-fix.sh "/Applications/Resident Evil 7.app"
+```
+
 ## Optional fullscreen branch
 
 If the controller fix works but fullscreen opens at the wrong size on different displays, use:
