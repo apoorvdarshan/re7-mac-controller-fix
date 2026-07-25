@@ -101,7 +101,7 @@ choose_fullscreen_mode
 
 WARMUP_LOG="/tmp/re7-controller-warmup.log"
 if [[ -x "${SELF_DIR}/sdl-warmup-x86" ]]; then
-  "${SELF_DIR}/sdl-warmup-x86" 5000 >"${WARMUP_LOG}" 2>&1 || true
+  /usr/bin/perl -e 'alarm shift; exec @ARGV' 10 "${SELF_DIR}/sdl-warmup-x86" 5000 >"${WARMUP_LOG}" 2>&1 || true
 fi
 
 exec "${SELF_DIR}/__TARGET_EXECUTABLE__" "$@"
