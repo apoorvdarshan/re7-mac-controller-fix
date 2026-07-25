@@ -23,6 +23,7 @@ else
 fi
 
 clang -arch x86_64 \
+  -Wl,-headerpad_max_install_names \
   "${REPO_ROOT}/src/sdl-guid-probe.c" \
   "${SDL_CFLAGS[@]}" \
   "${SDL_LIB}" \
@@ -30,6 +31,7 @@ clang -arch x86_64 \
 
 install_name_tool -change /opt/local/lib/libSDL2-2.0.0.dylib "${SDL_LIB}" "${OUT_BIN}" 2>/dev/null || true
 install_name_tool -change /opt/homebrew/opt/sdl2/lib/libSDL2-2.0.0.dylib "${SDL_LIB}" "${OUT_BIN}" 2>/dev/null || true
+install_name_tool -change libSDL2.dylib "${SDL_LIB}" "${OUT_BIN}" 2>/dev/null || true
 
 if [[ -n "${MAPPING}" ]]; then
   SDL_GAMECONTROLLERCONFIG="${MAPPING}" "${OUT_BIN}" 5000
