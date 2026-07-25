@@ -9,47 +9,30 @@ DISPLAY_LOG="/tmp/re7-display-mode.log"
 choose_fullscreen_mode() {
   [[ -f "${CONFIG_PATH}" ]] || return 0
 
-  /usr/sbin/system_profiler -json SPDisplaysDataType > /tmp/re7-spdisplays.json 2>/dev/null || return 0
+  local display_size
+  local python_bin="/opt/homebrew/bin/python3"
 
-  /usr/bin/python3 - "${CONFIG_PATH}" "${DISPLAY_LOG}" <<'PY' || true
-import json
-import re
+  display_size="$(/usr/bin/osascript -l JavaScript -e 'ObjC.import("AppKit"); var f = $.NSScreen.mainScreen.frame; Math.round(f.size.width) + "x" + Math.round(f.size.height);' 2>/dev/null)" || return 0
+  [[ "${display_size}" == <->x<-> ]] || return 0
+
+  if [[ ! -x "${python_bin}" ]]; then
+    python_bin="/usr/local/bin/python3"
+  fi
+  [[ -x "${python_bin}" ]] || return 0
+
+  "${python_bin}" - "${CONFIG_PATH}" "${DISPLAY_LOG}" "${display_size}" <<'PY' || true
 import sys
 from pathlib import Path
 
 config_path = Path(sys.argv[1])
 log_path = Path(sys.argv[2])
-sp_path = Path("/tmp/re7-spdisplays.json")
+target_w, target_h = (int(part) for part in sys.argv[3].split("x", 1))
 
 def log(msg: str) -> None:
     with log_path.open("a", encoding="utf-8") as fh:
         fh.write(msg + "\n")
 
-try:
-    sp = json.loads(sp_path.read_text(encoding="utf-8"))
-except Exception as exc:
-    log(f"display-mode: failed to read display info: {exc}")
-    raise SystemExit(0)
-
-target_w = None
-target_h = None
-for gpu in sp.get("SPDisplaysDataType", []):
-    displays = gpu.get("spdisplays_ndrvs", [])
-    main = next((d for d in displays if d.get("spdisplays_main") == "spdisplays_yes"), None)
-    chosen = main or next((d for d in displays if d.get("spdisplays_online") == "spdisplays_yes"), None)
-    if not chosen:
-        continue
-    res = chosen.get("_spdisplays_resolution") or chosen.get("_spdisplays_pixels") or ""
-    match = re.search(r"(\d+)\s*x\s*(\d+)", res)
-    if match:
-        target_w = int(match.group(1))
-        target_h = int(match.group(2))
-        log(f"display-mode: target display={chosen.get('_name','unknown')} {target_w}x{target_h}")
-        break
-
-if not target_w or not target_h:
-    log("display-mode: no target display resolution found")
-    raise SystemExit(0)
+log(f"display-mode: target display={target_w}x{target_h}")
 
 lines = config_path.read_text(encoding="utf-8", errors="ignore").splitlines()
 values = {}
