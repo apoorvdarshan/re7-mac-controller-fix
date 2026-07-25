@@ -79,6 +79,26 @@ To restore the app plist saved before this fix:
 ./scripts/revert-fresh-install-fix.sh "/Applications/Resident Evil 7.app"
 ```
 
+## Prefer an external display for RE7 only
+
+To launch RE7 on `VX2779 Series` whenever it is connected, while leaving the
+macOS Main Display unchanged:
+
+```bash
+./scripts/install-external-display-helper.sh "/Applications/Resident Evil 7.app"
+```
+
+The helper moves only RE7's own Wine window. If the preferred external display
+is disconnected, Wine keeps its normal MacBook display placement. macOS asks
+for Accessibility access once because moving another process's window requires
+that system permission.
+
+To remove the helper:
+
+```bash
+./scripts/revert-external-display-helper.sh "/Applications/Resident Evil 7.app"
+```
+
 ## Optional fullscreen branch
 
 If the controller fix works but fullscreen opens at the wrong size on different displays, use:
