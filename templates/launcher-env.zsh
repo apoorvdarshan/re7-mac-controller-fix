@@ -3,7 +3,7 @@ set -euo pipefail
 
 SELF_DIR="${0:A:h}"
 CONTENTS_DIR="${SELF_DIR:h}"
-CONFIG_PATH="${CONTENTS_DIR}/SharedSupport/prefix/drive_c/ToxicGame/RESIDENT-EVIL-7/RESIDENT EVIL 7 biohazard/re7_config.ini"
+CONFIG_PATH="${CONTENTS_DIR}/SharedSupport/prefix/drive_c/toxicgames.in/RESIDENT-EVIL-7/RESIDENT EVIL 7 biohazard/re7_config.ini"
 DISPLAY_LOG="/tmp/re7-display-mode.log"
 
 choose_fullscreen_mode() {
